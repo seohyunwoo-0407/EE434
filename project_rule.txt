@@ -1,0 +1,89 @@
+Project Task
+This project deals with **"out-of-domain face recognition"**. The main training dataset contains only specific demographics, so the person photos are biased toward one group. However, during testing, the model is evaluated on people with different data distributions from the training data (e.g., different race, age, gender, etc.).
+
+Data
+All of the data will be placed in /mnt/home/ee40034/data on the EE Haedong Lounge servers.
+train1: 981,007 images of 2,882 identities, Caucasian male only.
+train2: 64,380 images of 949 identities, Korean mixed gender.
+val: 3,185 images of 50 identities, Korean mixed gender.
+test: ground truth not provided, Korean mixed gender.
+
+Pre-training Data
+You will be allowed to use a subset of VGGFace2 for pre-training.
+
+Code
+The baseline code will be placed in /mnt/home/20230345/ee40034/code on the EE Haedong Lounge servers. There are a few # (write your code here) to fill in. 
+
+Frequently asked questions
+1. I do not have permission to install tmux
+    Install inside the conda virtual environment: conda install -c conda-forge tmux
+2. Can I use the test data for unsupervised/self-supervised training?
+    You cannot use the test data for training, supervised or unsupervised.
+3. Can I use external images for data augmentation?
+    You cannot use any external face data. You can use images of other objects, such as overlaying sunglasses on faces.
+4. Disk is full error appears.
+    Each user has a 100GB storage limit. Try deleting old checkpoint files to free up space.
+5. When I change the nClasses parameter during fine-tuning, I get a wrong parameter length warning message.
+    It’s just a re-initialization of the last classification layer used during pre-training, so it should not affect the training. You can ignore the warning.
+6. Model training is much slower than expected.
+    Training the baseline model should take about 1 hour per epoch for train1 and 4 minutes per epoch for train2. If the training is much slower, please ask a TA during helpdesk. Also, try checking the CPU utilization using top command.
+7. Can I use external pre-trained models for data pre-processing?
+    No. You can only use the models trained using the provided data (train1 and train2), even for pre-processing.
+
+Instructions
+Key rules
+You can:
+1. Change the model
+2. Change the loss function
+3. Change hyper-parameters (learning rate, weight decay, number of epochs, etc.)
+4. Change data augmentation
+5. Add modules to the provided baseline code
+6. Use open-source modules (e.g. conda install ... or pip install ...)
+7. Pre-process the training data (using face recognition models pre-trained on external data is not allowed)
+
+You cannot:
+1. Use external data apart from what is provided on this page
+2. Use pre-trained face recognition models for initializing the model or data pre-processing
+3. You can use the MTCNN face detection model for pre-processing if you need
+4. Use model with more than 11.5 million parameters (except the FC / classification layer)
+5. The number of parameters will be shown when you run the code - e.g. Total model parameters: 11,439,168
+6. Train using multiple GPUs (e.g. DistributedDataParallel)
+7. Work in teams
+7. Use a completely different framework from the provided baseline
+
+If in doubt, please ask on KLMS Q&A.
+
+Checking baseline implementation
+If you implemented the baseline correctly, the performance for the first two epochs should be similar to below. 
+
+Train set 1:
+python ./trainEmbedNet.py --gpu 0 --train_path /mnt/home/ee40034/data/train1 --test_path /mnt/home/ee40034/data/val --test_list /mnt/home/ee40034/data/val_pairs.csv --save_path ./exps/exp01 
+[INFO] :: 2025-11-08 01:11:48 :: Epoch 0001 started with LR 0.00100 
+[INFO] :: 2025-11-08 01:29:15 :: Epoch 0001 completed with TLOSS 4.61156
+[INFO] :: 2025-11-08 01:29:15 :: Epoch 0002 started with LR 0.00100 
+[INFO] :: 2025-11-08 01:46:36 :: Epoch 0002 completed with TLOSS 2.24450
+[INFO] :: 2025-11-08 01:46:50 :: Epoch 0002, Val EER 21.65%
+
+Train set 2:
+python ./trainEmbedNet.py --gpu 7 --train_path /mnt/home/ee40034/data/train2 --test_path /mnt/home/ee40034/data/val --test_list /mnt/home/ee40034/data/val_pairs.csv --save_path ./exps/exp02 
+[INFO] :: 2025-11-08 11:57:01 :: Epoch 0001 started with LR 0.00100
+[INFO] :: 2025-11-08 12:00:05 :: Epoch 0001 completed with TLOSS 6.54578
+[INFO] :: 2025-11-08 12:00:05 :: Epoch 0002 started with LR 0.00100
+[INFO] :: 2025-11-08 12:03:13 :: Epoch 0002 completed with TLOSS 5.88727
+[INFO] :: 2025-11-08 12:03:34 :: Epoch 0002, Val EER 23.62%
+
+Results and code
+The ground truth labels in the test set are randomized. Therefore, you will get an EER of around 50% when you run your code, which is normal.
+You should save the results to file using --eval --output $PATH flags in the baseline code. This will be required to submit your results.
+You should submit the bash script that you used to execute training. You should also submit any pre-processing code (e.g. cropping data) if you used any.
+
+Report submission
+The report should be up to 3 pages including references, double-column, font size between 10 and 12. The following is a non-exhaustive list of things that you might want to include in your report:
+
+Key design choices such as loss functions, models, etc.
+Hyperparameters
+Ablations you have tried
+Validation / test set performance
+Equipment (GPU) used to train your model
+
+So, during experiment, record things we try in /mnt/home/20230345/ee40034/report.txt.

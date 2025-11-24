@@ -78,17 +78,17 @@ class ModelTrainer(object):
                 data    = data.transpose(1,0)
 
                 ## Reset gradients
-                # (write your code here)
+                self.__optimizer__.zero_grad()
 
                 ## Forward pass and compute loss
                 nloss = self.__model__(data.cuda(), label.cuda())
                 ## Backward pass
-                # (write your code here)
+                nloss.backward()
                 ## Optimizer step
-                # (write your code here)
+                self.__optimizer__.step()
 
                 ## Keep cumulative statistics
-                loss    += # (write your code here)
+                loss    += nloss.item()
                 counter += 1;
 
                 # Print statistics to progress bar
@@ -136,6 +136,9 @@ class ModelTrainer(object):
         for data in tqdm(test_loader):
             inp1                = data[0][0].cuda()
             ref_feat            = self.__model__(inp1).detach().cpu()
+            # Squeeze batch dimension to ensure features are 1D [512] instead of [1, 512]
+            if ref_feat.dim() > 1:
+                ref_feat = ref_feat.squeeze(0)
             feats[data[1][0]]   = ref_feat
 
         all_scores = [];
@@ -153,7 +156,12 @@ class ModelTrainer(object):
             com_feat = feats[data[2]]
 
             ## Find cosine similarity score
-            score = # (write your code here)
+            # Ensure features are 1D, then add batch dimension for cosine_similarity
+            if ref_feat.dim() == 1:
+                ref_feat = ref_feat.unsqueeze(0)
+            if com_feat.dim() == 1:
+                com_feat = com_feat.unsqueeze(0)
+            score = F.cosine_similarity(ref_feat, com_feat, dim=1)
 
             all_scores.append(score.item());  
             all_labels.append(int(data[0]));

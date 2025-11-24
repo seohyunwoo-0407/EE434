@@ -74,13 +74,15 @@ args = parser.parse_args();
 def compute_eer(all_labels,all_scores):
 
     # compute receiver operating characteristic (ROC) for binary classification
-    # (write your code here)
+    fpr, tpr, thresholds = metrics.roc_curve(all_labels, all_scores, pos_label=1)
 
     # calculate false negative rate (FNR)
-    # (write your code here)
+    fnr = 1 - tpr
 
     # calculate equal error rate (EER). The EER is the error rate at which FNR is equal to FPR.
-    # (write your code here)
+    # Find the threshold where FNR is closest to FPR
+    eer_threshold_idx = numpy.nanargmin(numpy.absolute(fnr - fpr))
+    EER = fpr[eer_threshold_idx]
 
     return EER
 
